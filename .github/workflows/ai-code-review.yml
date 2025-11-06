@@ -11,7 +11,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # 👈 Important! fetch full history so 'origin/main' exists
+              fetch-depth: 0             # fetch full history
+              ref: ${{ github.head_ref }}  # ensures the PR branch is checked out
 
       - name: Fetch main branch
         run: git fetch origin main   # 👈 Ensures 'origin/main' is available locally
