@@ -58,50 +58,49 @@ struct ContentView_Previews: PreviewProvider {
 #Preview {
     ContentView()
 }
-//import SwiftUI
-//
-//struct ContentView: View {
-//    var body: some View {
-//        NavigationStack {
-//            HomeView()
-//        }
-//    }
-//}
-//
-//struct HomeView: View {
-//    var body: some View {
-//        NavigationLink("Go to Detail View", destination: DetailView())
-//            .navigationTitle("Home")
-//    }
-//}
-//
-//struct DetailView: View {
-//    @EnvironmentObject var navigationState: NavigationState
-//
-//    var body: some View {
-//        VStack {
-//            Text("Detail View")
-//            Button("Go deeper") {
-//                navigationState.path.append("Another View")
-//            }
-//        }
-//        .navigationTitle("Detail")
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button(action: {
-//                    navigationState.path.removeLast(navigationState.path.count)
-//                }) {
-//                    Image(systemName: "chevron.left")
-//                        .foregroundColor(.blue)
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//class NavigationState: ObservableObject {
-//    @Published var path = NavigationPath()
-//}
+
+struct ContentView1: View {
+    var body: some View {
+        NavigationStack {
+            HomeView()
+        }
+    }
+}
+
+struct HomeView: View {
+    var body: some View {
+        NavigationLink("Go to Detail View", destination: DetailView())
+            .navigationTitle("Home")
+    }
+}
+
+struct DetailView: View {
+    @EnvironmentObject var navigationState: NavigationState
+
+    var body: some View {
+        VStack {
+            Text("Detail View")
+            Button("Go deeper") {
+                navigationState.path.append("Another View")
+            }
+        }
+        .navigationTitle("Detail")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    navigationState.path.removeLast(navigationState.path.count)
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.blue)
+                }
+            }
+        }
+    }
+}
+
+class NavigationState: ObservableObject {
+    @Published var path = NavigationPath()
+}
 
 
 
