@@ -10,8 +10,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 👈 Important! fetch full history so 'origin/main' exists
 
-      - name: Run AI Review
+      - name: Fetch main branch
+        run: git fetch origin main   # 👈 Ensures 'origin/main' is available locally
+
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -19,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: pip install openai requests
 
-      - name: Run review script
+      - name: Run AI Review
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
