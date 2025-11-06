@@ -5,22 +5,26 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  review:
+  ai_review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR branch
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0           # full history
-          ref: ${{ github.head_ref }}  # checkout PR branch
+          fetch-depth: 0
+          # fetch all branches so origin/main (or base) exists
+          ref: ${{ github.head_ref }}
 
-      - name: Fetch base branch
-        run: git fetch origin ${{ github.event.pull_request.base.ref }}  # ensures base exists
+      - name: Fetch all branches
+        run: git fetch --all
 
-      - name: Set up Python
+      - name: Verify branches
+        run: git branch -a
+
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install openai requests
@@ -29,5 +33,5 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_BASE_REF: ${{ github.event.pull_request.base.ref }}  # pass base branch to script
+          GITHUB_BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: python .github/scripts/ai_review.py
