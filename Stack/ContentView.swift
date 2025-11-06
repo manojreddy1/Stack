@@ -98,9 +98,9 @@ struct ContentView_Previews: PreviewProvider {
 //    }
 //}
 //
-class NavigationState: ObservableObject {
-    @Published var path = NavigationPath()
-}
+//class NavigationState: ObservableObject {
+//    @Published var path = NavigationPath()
+//}
 
 
 
