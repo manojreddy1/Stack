@@ -9,8 +9,13 @@ github_token = os.environ["GITHUB_TOKEN"]
 repo = os.environ["GITHUB_REPOSITORY"]
 pr_number = os.environ["GITHUB_REF"].split("/")[-2]
 
-# Get the git diff for the PR
-diff = subprocess.check_output(["git", "diff", "origin/main...HEAD"]).decode("utf-8")
+base_branch = os.environ.get("GITHUB_BASE_REF", "main")
+
+# Fetch base branch
+subprocess.run(["git", "fetch", "origin", base_branch], check=True)
+
+# Get diff
+diff = subprocess.check_output(["git", "diff", f"origin/{base_branch}...HEAD"]).decode("utf-8")
 
 prompt = f"""
 You are an expert iOS developer reviewing a pull request.
