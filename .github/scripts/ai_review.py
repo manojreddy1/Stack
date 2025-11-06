@@ -1,30 +1,39 @@
 import os
 import subprocess
+import sys
 
-base_branch = os.environ.get("GITHUB_BASE_REF", "main")
+# Get base and head branches
+base_branch = os.environ.get("GITHUB_BASE_REF")
+head_branch = os.environ.get("GITHUB_HEAD_REF")
 
-# Ensure the base branch exists locally
+if not base_branch or not head_branch:
+    print("Missing branch information from environment.")
+    sys.exit(1)
+
+# Fetch both branches explicitly
 subprocess.run(["git", "fetch", "origin", base_branch], check=True)
+subprocess.run(["git", "fetch", "origin", head_branch], check=True)
 
-# Show all branches for debugging
-subprocess.run(["git", "branch", "-a"], check=True)
+# Get the merge-base commit
+merge_base = subprocess.check_output(
+    ["git", "merge-base", f"origin/{base_branch}", f"origin/{head_branch}"]
+).decode("utf-8").strip()
 
-# Compute diff
-try:
-    diff = subprocess.check_output(["git", "diff", f"origin/{base_branch}...HEAD"]).decode("utf-8")
-except subprocess.CalledProcessError as e:
-    print("Error computing diff:", e)
-    exit(1)
+# Compute diff from merge-base to HEAD
+diff = subprocess.check_output(
+    ["git", "diff", f"{merge_base}..origin/{head_branch}"]
+).decode("utf-8")
 
 if not diff.strip():
     print("No changes detected in PR.")
-    exit(0)
+    sys.exit(0)
 
 # AI review example
 import openai
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 prompt = f"Review the following code diff:\n\n{diff}"
+
 response = openai.ChatCompletion.create(
     model="gpt-4",
     messages=[{"role": "user", "content": prompt}],
