@@ -8,14 +8,14 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-              fetch-depth: 0             # fetch full history
-              ref: ${{ github.head_ref }}  # ensures the PR branch is checked out
+          fetch-depth: 0           # full history
+          ref: ${{ github.head_ref }}  # checkout PR branch
 
-      - name: Fetch main branch
-        run: git fetch origin main   # 👈 Ensures 'origin/main' is available locally
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.event.pull_request.base.ref }}  # ensures base exists
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,4 +29,5 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_BASE_REF: ${{ github.event.pull_request.base.ref }}  # pass base branch to script
         run: python .github/scripts/ai_review.py
