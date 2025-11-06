@@ -15,7 +15,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Analytics.logEvent("screen_view1", parameters: [
             "test_timestamp": Date().timeIntervalSince1970
         ])
-        //let settings = Analytics.sharedInstance()
         if let firebaseApp = FirebaseApp.app() {
             print("Firebase Analytics configured for GA4 property: \(firebaseApp.options.projectID)")
         }
