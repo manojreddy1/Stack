@@ -1,35 +1,29 @@
 import os
-import subprocess
-import sys
+import requests
+import openai
 
-# Get base and head branches
-base_branch = os.environ.get("GITHUB_BASE_REF")
-head_branch = os.environ.get("GITHUB_HEAD_REF")
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+PR_NUMBER = os.environ["GITHUB_REF"].split("/")[-1]  # PR number from ref
+REPO = os.environ["GITHUB_REPOSITORY"]
 
-if not base_branch or not head_branch:
-    print("Missing branch information from environment.")
-    sys.exit(1)
+headers = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github.v3.diff"
+}
 
-# Fetch both branches explicitly
-subprocess.run(["git", "fetch", "origin", base_branch], check=True)
-subprocess.run(["git", "fetch", "origin", head_branch], check=True)
+url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}"
 
-# Get the merge-base commit
-merge_base = subprocess.check_output(
-    ["git", "merge-base", f"origin/{base_branch}", f"origin/{head_branch}"]
-).decode("utf-8").strip()
+resp = requests.get(url, headers=headers)
+if resp.status_code != 200:
+    print(f"Failed to fetch PR diff: {resp.status_code}")
+    exit(1)
 
-# Compute diff from merge-base to HEAD
-diff = subprocess.check_output(
-    ["git", "diff", f"{merge_base}..origin/{head_branch}"]
-).decode("utf-8")
-
+diff = resp.text
 if not diff.strip():
     print("No changes detected in PR.")
-    sys.exit(0)
+    exit(0)
 
-# AI review example
-import openai
+# AI review
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 prompt = f"Review the following code diff:\n\n{diff}"
